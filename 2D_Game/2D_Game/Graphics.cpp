@@ -7,7 +7,8 @@ Graphics::Graphics()
 {
 	m_Direct3D = nullptr;
 	m_Device3D = nullptr;
-	m_BackColor = SETCOLOR_ARGB(255, 255, 0, 128);
+	m_Sprite = nullptr;
+	m_BackColor = GraphicsNS::BACK_COLOR;
 }
 
 Graphics::~Graphics()
@@ -17,6 +18,7 @@ Graphics::~Graphics()
 
 void Graphics::ReleaseAll()
 {
+	SAFE_RELEASE(m_Sprite);
 	SAFE_RELEASE(m_Device3D);
 	SAFE_RELEASE(m_Direct3D);
 }
@@ -100,6 +102,94 @@ void Graphics::InitD3Dpp(void)
 	{
 		throw(GameError(GameErrorNS::FATAL_ERROR, "Error initializing D3D Presentation Parameters"));
 	}
+}
+
+HRESULT Graphics::LoadTextures(const char* pFileName, COLOR_ARGB transColor, UINT& iWidth, UINT& iHeight, LP_TEXTURE& texture)
+{
+	// Struct for reading file info.
+	D3DXIMAGE_INFO info;
+	m_Result = E_FAIL;
+
+	try
+	{
+		if(nullptr == pFileName)
+		{
+			texture = nullptr;
+			return D3DERR_INVALIDCALL;
+		}
+
+		// Get width and height from file.
+		m_Result = D3DXGetImageInfoFromFile(pFileName, &info);
+		if(D3D_OK != m_Result)
+		{
+			return m_Result;
+		}
+
+		m_iWidth = info.Width;
+		m_iHeight = info.Height;
+
+		// Create the new texture by loading from file.
+		m_Result = D3DXCreateTextureFromFileEx(m_Device3D, pFileName, info.Width, info.Height, 1, 0, D3DFMT_UNKNOWN, D3DPOOL_DEFAULT, D3DX_DEFAULT, D3DX_DEFAULT, transColor, &info, nullptr, &texture);
+	}
+	catch(...)
+	{
+		throw(GameError(GameErrorNS::FATAL_ERROR, "Error in Graphics::LoadTexture"));
+	}
+
+	return m_Result;
+}
+
+void Graphics::DrawSprite(const SpriteData& spriteData, COLOR_ARGB color /* = GraphicsNS::WHITE */)
+{
+	if(nullptr == spriteData.texture)
+	{
+		return;
+	}
+
+	// Find the center of sprite.
+	D3DXVECTOR2 spriteCenter = D3DXVECTOR2((float)(spriteData.iWidth / 2 * spriteData.fScale), (float)(spriteData.iHeight / 2 * spriteData.fScale));		
+
+	// Screen position of sprite.
+	D3DXVECTOR2 translate = D3DXVECTOR2((float)spriteData.fX, (float)spriteData.fY);
+
+	// Scaling X, Y
+	D3DXVECTOR2 scaling(spriteData.fScale, spriteData.fScale);
+
+	if(spriteData.bFlipHorizontal)
+	{
+		// Negative X scale to flip.
+		scaling.x *= -1;
+		
+		// Get the center of flipped image.
+		spriteCenter.x -= (float)(spriteData.iWidth * spriteData.fScale);
+
+		// Flip occurs around left edge, translate to put
+		// Flipped image in same location as original.
+		translate.x += (float)(spriteData.iWidth * spriteData.fScale);
+	}
+
+	if(spriteData.bFlipVertical)
+	{
+		// Negate y scale to flip.
+		scaling.y *= -1;
+
+		// Get center of flipped image.
+		spriteCenter.y -= (float)(spriteData.iHeight * spriteData.fScale);
+
+		// Flip occurs around top edge, translate down to put
+		// flipped image in same location as original.
+		translate.y += (float)(spriteData.iHeight * spriteData.fScale);
+	}
+
+	// Create a matrix to rotate, scale, and position our sprite.
+	D3DXMATRIX matrix;
+	D3DXMatrixTransformation2D(&matrix, nullptr, 0.0f, &scaling, &spriteCenter, (float)(spriteData.fAngle), &translate);
+
+	// Tell the sprite about the matrix.
+	m_Sprite->SetTransform(&matrix);
+
+	// Draw the sprite.
+	m_Sprite->Draw(spriteData.texture, &spriteData.rect, nullptr, nullptr, color);
 }
 
 HRESULT Graphics::ShowBackBuffer(void)
