@@ -73,6 +73,13 @@ void Graphics::Initialize(HWND hWnd, int iWidth, int iHeight, bool bFullscreen)
 	{
 		throw(GameError(GameErrorNS::FATAL_ERROR, "Error creating Direct3D Device!"));
 	}
+
+	// Create sprite
+	m_Result = D3DXCreateSprite(m_Device3D, &m_Sprite);
+	if(FAILED(m_Result))
+	{
+		throw(GameError(GameErrorNS::FATAL_ERROR, "Error creating Direct3D sprite!"));
+	}
 }
 
 void Graphics::InitD3Dpp(void)
@@ -82,8 +89,8 @@ void Graphics::InitD3Dpp(void)
 		ZeroMemory(&m_D3Dpp, sizeof(m_D3Dpp));
 
 		// Fill in the parameters we need.
-		m_D3Dpp.BackBufferWidth = m_iWidth;
-		m_D3Dpp.BackBufferHeight = m_iHeight;
+		m_D3Dpp.BackBufferWidth		= m_iWidth;
+		m_D3Dpp.BackBufferHeight	= m_iHeight;
 		if(m_bFullScreen)
 		{
 			m_D3Dpp.BackBufferFormat = D3DFMT_X8R8G8B8;		 // Use 24 bit color.
@@ -93,11 +100,11 @@ void Graphics::InitD3Dpp(void)
 			m_D3Dpp.BackBufferFormat = D3DFMT_UNKNOWN;
 		}
 
-		m_D3Dpp.BackBufferCount = 1;
-		m_D3Dpp.SwapEffect = D3DSWAPEFFECT_DISCARD;
-		m_D3Dpp.hDeviceWindow = m_Hwnd;
-		m_D3Dpp.Windowed = (!FULLSCREEN);
-		m_D3Dpp.PresentationInterval = D3DPRESENT_INTERVAL_IMMEDIATE;
+		m_D3Dpp.BackBufferCount			= 1;
+		m_D3Dpp.SwapEffect				= D3DSWAPEFFECT_DISCARD;
+		m_D3Dpp.hDeviceWindow			= m_Hwnd;
+		m_D3Dpp.Windowed				= (!m_bFullScreen);
+		m_D3Dpp.PresentationInterval	= D3DPRESENT_INTERVAL_IMMEDIATE;
 	}catch(...)
 	{
 		throw(GameError(GameErrorNS::FATAL_ERROR, "Error initializing D3D Presentation Parameters"));
@@ -125,8 +132,8 @@ HRESULT Graphics::LoadTextures(const char* pFileName, COLOR_ARGB transColor, UIN
 			return m_Result;
 		}
 
-		m_iWidth = info.Width;
-		m_iHeight = info.Height;
+		iWidth = info.Width;
+		iHeight = info.Height;
 
 		// Create the new texture by loading from file.
 		m_Result = D3DXCreateTextureFromFileEx(m_Device3D, pFileName, info.Width, info.Height, 1, 0, D3DFMT_UNKNOWN, D3DPOOL_DEFAULT, D3DX_DEFAULT, D3DX_DEFAULT, transColor, &info, nullptr, &texture);
@@ -192,6 +199,67 @@ void Graphics::DrawSprite(const SpriteData& spriteData, COLOR_ARGB color /* = Gr
 	m_Sprite->Draw(spriteData.texture, &spriteData.rect, nullptr, nullptr, color);
 }
 
+void Graphics::ChangeDisplayMode(GraphicsNS::DISPLAY_MODE mode /* = GraphicsNS::TOGGLE */)
+{
+	try
+	{
+		switch(mode)
+		{
+			case GraphicsNS::FULLSCREEN:
+
+				// If the game is already in fullscren mode, return
+				if(m_bFullScreen)
+				{
+					return;
+				}
+
+				m_bFullScreen = true;
+				break;
+
+			 case GraphicsNS::WINDOW:	
+
+				if(m_bFullScreen == false)
+				{
+					return;
+				}
+
+				m_bFullScreen = false;
+				break;
+
+			default:
+				
+				m_bFullScreen = !m_bFullScreen;
+		}
+
+		Reset();
+		if(m_bFullScreen)
+		{
+			SetWindowLong(m_Hwnd, GWL_STYLE, WS_EX_TOPMOST | WS_VISIBLE | WS_POPUP);
+		}
+		else		// Windowed
+		{
+			SetWindowLong(m_Hwnd, GWL_STYLE, WS_OVERLAPPEDWINDOW);
+			SetWindowPos(m_Hwnd, HWND_TOP, 0, 0, GAME_WIDTH, GAME_HEIGHT, SWP_FRAMECHANGED | SWP_NOMOVE | SWP_NOSIZE | SWP_SHOWWINDOW);
+
+			// Adjust window size so client area is GAME_WIDTH x GAME_HEIGHT
+			RECT clientRect;
+			GetClientRect(m_Hwnd, &clientRect);
+			MoveWindow(m_Hwnd, 0, 0, GAME_WIDTH + (GAME_WIDTH - clientRect.right), GAME_HEIGHT + (GAME_HEIGHT - clientRect.bottom), TRUE);
+		}
+	}
+	catch(...)
+	{
+		// An error occurred, try windowed mode.
+		SetWindowLong(m_Hwnd, GWL_STYLE, WS_OVERLAPPEDWINDOW);
+		SetWindowPos(m_Hwnd, HWND_TOP, 0, 0, GAME_WIDTH, GAME_HEIGHT, SWP_FRAMECHANGED | SWP_NOMOVE | SWP_NOSIZE | SWP_SHOWWINDOW);
+
+		// Adjust window size so client area is GAME_WIDTH x GAME_HEIGHT
+		RECT clientRect;
+		GetClientRect(m_Hwnd, &clientRect);
+		MoveWindow(m_Hwnd, 0, 0, GAME_WIDTH + (GAME_WIDTH - clientRect.right), GAME_HEIGHT + (GAME_HEIGHT - clientRect.bottom), TRUE);
+	}
+}
+
 HRESULT Graphics::ShowBackBuffer(void)
 {
 	m_Result = E_FAIL;
@@ -234,7 +302,16 @@ HRESULT Graphics::GetDeviceState(void)
 HRESULT Graphics::Reset(void)
 {
 	m_Result = E_FAIL;
+
+	// Re-initialize the D3D presentation parameters.
 	InitD3Dpp();
+	m_Sprite->OnLostDevice();
+
+	// Attempt to reset graphics.
 	m_Result = m_Device3D->Reset(&m_D3Dpp);
+
+	// Reset sprite.
+	m_Sprite->OnResetDevice();
+
 	return m_Result;
 }

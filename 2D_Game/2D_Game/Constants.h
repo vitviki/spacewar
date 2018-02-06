@@ -13,11 +13,39 @@
 
 #define SAFE_DELETE_ARRAY(ptr) { if(ptr) { delete [](ptr); (ptr) = nullptr; } }
 
+// Safely delete onLostDevice.
+#define SAFE_ON_LOST_DEVICE(ptr) { if(ptr) { ptr->OnLostDevice(); } }
+
+// Safely call OnResetDevice
+#define SAFE_ON_RESET_DEVICE(ptr) { if(ptr) { ptr->OnResetDevice(); } }
+
+// Color Defines
+#define COLOR_ARGB DWORD
+#define SETCOLOR_ARGB(a,r,g,b) \
+	((COLOR_ARGB)((((a)&0xff)<<24)|(((r)&0xff)<<16)|(((g)&0xff)<<8)|((b)&0xff)))
+
+
+// Transparent color magenta
+#define TRANSCOLOR SETCOLOR_ARGB(0, 255, 0, 255)
+
+
 // Constants
 
+const char SHIP_IMAGE[] = "textures\\ship.png";
+
+const char CLASS_NAME[] = "Spacewar";
+const char GAME_TITLE[] = "Spacewar";
 const bool FULLSCREEN = FALSE;
 const UINT GAME_WIDTH = 640;
 const UINT GAME_HEIGHT = 480;
+
+const int SHIP_START_FRAME = 4;						// Starting frame of ship animation.
+const int SHIP_END_FRAME = 4;						// Last frame of ship animation.
+const float SHIP_ANIMATION_DELAY = .2f;				// Time between frames of ship animation.
+const int SHIP_COLS = 3;							// Ship texture has 2 columns;
+const int SHIP_WIDTH = 32;							// Width of ship image.
+const int SHIP_HEIGHT = 32;							// Height of ship image.
+
 
 // Game
 const double PI = 3.14159265;						// Target frame rate

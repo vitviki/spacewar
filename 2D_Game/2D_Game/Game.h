@@ -62,6 +62,9 @@ public:
 	//Handle lost graphics device.
 	virtual void HandleLostGraphicsDevice(void);
 
+	// Set display mode (fullscreen, window or toggle)
+	void SetDisplayMode(GraphicsNS::DISPLAY_MODE mode = GraphicsNS::TOGGLE);
+
 	// Return pointer to graphics.
 	Graphics* GetGraphics(void)
 	{

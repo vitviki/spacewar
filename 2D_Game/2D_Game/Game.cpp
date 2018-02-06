@@ -171,6 +171,13 @@ void Game::HandleLostGraphicsDevice(void)
 	}
 }
 
+void Game::SetDisplayMode(GraphicsNS::DISPLAY_MODE mode /* = GraphicsNS::TOGGLE */)
+{
+	ReleaseAll();
+	m_pGraphics->ChangeDisplayMode(mode);
+	ResetAll();
+}
+
 void Game::Run(HWND hWnd)
 {
 	if(nullptr == m_pGraphics)
@@ -213,6 +220,18 @@ void Game::Run(HWND hWnd)
 	}
 
 	RenderGame();
+
+	// if Alt+Enter toggel fullscreen/window.
+	if(m_pInput->IsKeyDown(ALT_KEY) && m_pInput->WasKeyPressed(ENTER_KEY))
+	{
+		SetDisplayMode(GraphicsNS::TOGGLE);
+	}
+
+	// If Esc key is preesed, set window mode.
+	if(m_pInput->IsKeyDown(ESC_KEY))
+	{
+		SetDisplayMode(GraphicsNS::WINDOW);
+	}
 
 	// Clear all key presses.
 	m_pInput->Clear(InputNS::KEYS_PRESSED);

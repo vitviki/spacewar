@@ -14,8 +14,6 @@ LRESULT WINAPI WinProc(HWND hWnd, UINT, WPARAM wParam, LPARAM lParam);
 
 // Global Variable.	
 HINSTANCE hInst;
-const char *CLASS_NAME = "WinMain";
-const char *GAME_TITLE = "Engine Part 1";
 
 // Graphics Pointer
 Spacewar *game = nullptr;

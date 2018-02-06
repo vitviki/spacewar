@@ -4,6 +4,8 @@
 #define WIN32_LEAN_AND_MEAN
 
 #include "Game.h"
+#include "TextureManager.h"
+#include "Image.h"
 
 // Main game.
 class Spacewar : public Game
@@ -11,6 +13,8 @@ class Spacewar : public Game
 private:
 
 	// variables.
+	TextureManager m_ShipTexture;
+	Image			m_Ship1, m_Ship2;
 
 public:
 
