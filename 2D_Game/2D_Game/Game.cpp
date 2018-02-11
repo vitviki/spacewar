@@ -201,7 +201,7 @@ void Game::Run(HWND hWnd)
 
 	if(m_fFrameTime > 0.0f)
 	{
-		m_fFPS = (float)(m_fFPS * 0.99f) + (0.01 / m_fFrameTime);
+		m_fFPS = (m_fFPS * 0.99f) + (0.01f / m_fFrameTime);
 	}
 
 	if(m_fFrameTime > MAX_FRAME_TIME)
@@ -221,13 +221,13 @@ void Game::Run(HWND hWnd)
 
 	RenderGame();
 
-	// if Alt+Enter toggel fullscreen/window.
+	// if Alt+Enter toggle fullscreen/window.
 	if(m_pInput->IsKeyDown(ALT_KEY) && m_pInput->WasKeyPressed(ENTER_KEY))
 	{
 		SetDisplayMode(GraphicsNS::TOGGLE);
 	}
 
-	// If Esc key is preesed, set window mode.
+	// If Esc key is pressed, set window mode.
 	if(m_pInput->IsKeyDown(ESC_KEY))
 	{
 		SetDisplayMode(GraphicsNS::WINDOW);

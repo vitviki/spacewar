@@ -13,8 +13,14 @@ class Spacewar : public Game
 private:
 
 	// variables.
-	TextureManager m_ShipTexture;
-	Image			m_Ship1, m_Ship2;
+	TextureManager	m_ShipTexture;
+	TextureManager	m_Ship2Texture;
+	TextureManager	m_PlanetTexture;
+	TextureManager	m_NebulaTexture;
+	Image			m_Planet, m_Nebula;
+	Image			m_Ship1;
+	Image			m_Ship2;
+
 
 public:
 

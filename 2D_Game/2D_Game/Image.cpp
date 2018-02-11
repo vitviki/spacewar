@@ -65,9 +65,9 @@ bool Image::Initialize(Graphics* pGraphics, int iWidth, int iHeight, int iNCols,
 		}
 
 		// Configure spriteData.rect to draw currentFrame.
-		m_SpriteData.rect.left = (m_iCurrentFrame % iNCols) * m_SpriteData.iWidth;
+		m_SpriteData.rect.left = (m_iCurrentFrame % m_iCols) * m_SpriteData.iWidth;
 		m_SpriteData.rect.right = m_SpriteData.rect.left + m_SpriteData.iWidth;
-		m_SpriteData.rect.top = (m_iCurrentFrame / iNCols) * m_SpriteData.iHeight;
+		m_SpriteData.rect.top = (m_iCurrentFrame / m_iCols) * m_SpriteData.iHeight;
 		m_SpriteData.rect.bottom = m_SpriteData.rect.top + m_SpriteData.iHeight;
 	}
 	catch(...)
@@ -126,7 +126,7 @@ void Image::Update(float fFrameTime)
 		{
 			m_fAnimTimer -= m_fFrameDelay;
 			m_iCurrentFrame++;
-			if(m_iCurrentFrame < m_iStartFrame || m_iCurrentFrame > m_iStartFrame)
+			if(m_iCurrentFrame < m_iStartFrame || m_iCurrentFrame > m_iEndFrame)
 			{
 				if(true == m_bLoop)
 				{

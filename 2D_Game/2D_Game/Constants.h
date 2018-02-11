@@ -32,6 +32,9 @@
 // Constants
 
 const char SHIP_IMAGE[] = "textures\\ship.png";
+const char SHIP_2_IMAGE[] = "textures\\ship2.png";
+const char NEBULA_IMAGE[] = "textures\\orion.jpg";
+const char PLANET_IMAGE[] = "textures\\planet.png";
 
 const char CLASS_NAME[] = "Spacewar";
 const char GAME_TITLE[] = "Spacewar";
@@ -39,13 +42,16 @@ const bool FULLSCREEN = FALSE;
 const UINT GAME_WIDTH = 640;
 const UINT GAME_HEIGHT = 480;
 
-const int SHIP_START_FRAME = 4;						// Starting frame of ship animation.
-const int SHIP_END_FRAME = 4;						// Last frame of ship animation.
+const int SHIP_START_FRAME = 0;						// Starting frame of ship animation.
+const int SHIP_END_FRAME = 3;						// Last frame of ship animation.
 const float SHIP_ANIMATION_DELAY = .2f;				// Time between frames of ship animation.
-const int SHIP_COLS = 3;							// Ship texture has 2 columns;
+const int SHIP_COLS = 2;							// Ship texture has 2 columns;
 const int SHIP_WIDTH = 32;							// Width of ship image.
 const int SHIP_HEIGHT = 32;							// Height of ship image.
-
+const float ROTATION_RATE = 180.0f;					// Degrees per second
+const float SCALE_RATE = 0.2f;						// % change per second
+const float SHIP_SPEED = 100.0f;					// Pixels per second
+const float SHIP_SCALE = 1.5f;						// Starting ship scale.
 
 // Game
 const double PI = 3.14159265;						// Target frame rate
@@ -54,8 +60,12 @@ const float MIN_FRAME_RATE = 10.0f;					// Minimum desired time for 1 frame
 const float MIN_FRAME_TIME = 1.0f / FRAME_RATE;		// Maximum time use for calculations.
 const float MAX_FRAME_TIME = 1.0f / MIN_FRAME_RATE;
 
-const UCHAR ESC_KEY		= VK_ESCAPE;
-const UCHAR ALT_KEY		= VK_MENU;
-const UCHAR ENTER_KEY	= VK_RETURN;
+const UCHAR ESC_KEY			= VK_ESCAPE;
+const UCHAR ALT_KEY			= VK_MENU;
+const UCHAR ENTER_KEY		= VK_RETURN;
+const UCHAR SHIP_LEFT_KEY	= VK_LEFT;
+const UCHAR SHIP_RIGHT_KEY	= VK_RIGHT;
+const UCHAR	SHIP_UP_KEY		= VK_UP;
+const UCHAR SHIP_DOWN_KEY	= VK_DOWN;
 
 #endif
