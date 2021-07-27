@@ -2,6 +2,8 @@ Hello,
 
 this is a sample document as I am relearning github
 
+Second edit. Adding a little more text to test commit and revert in git.
+
 thanks
 
 Varun
